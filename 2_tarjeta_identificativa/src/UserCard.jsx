@@ -10,6 +10,7 @@ const UserCardWrapper = styled.div`
   width: 400px;
   height: 250px;
   background-color: #fff;
+  color:black;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   padding: 20px;
