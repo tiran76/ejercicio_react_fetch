@@ -3,53 +3,58 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { UserCard } from './UserCard';
 
-// Contenedor principal que ocupa todo el alto y ancho de la vista
 const AppContainer = styled.div`
   min-height: 100vh;
-  width: 100vw; // Asegúrate de que ocupa todo el ancho de la vista
+  width: 100vw;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
   box-sizing: border-box;
 `;
 
-// Contenedor del grid que organiza las tarjetas de usuario en filas de tres
 const GridLayout = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr); // Tres columnas de tamaño igual
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  width: 100%; // Asegúrate de que el grid ocupe todo el ancho del contenedor
-  max-width: 1200px; // Puedes ajustar esto para limitar el ancho del grid si es necesario
+  width: 100%;
+  max-width: 1200px;
 
   @media (max-width: 1200px) {
-    grid-template-columns: repeat(2, 1fr); // Dos columnas en pantallas más pequeñas
+    grid-template-columns: repeat(2, 1fr);
   }
 
   @media (max-width: 760px) {
-    grid-template-columns: 1fr; // Una columna en pantallas pequeñas
+    grid-template-columns: 1fr;
   }
 `;
 
-// Mensaje de carga y error
 const LoadingMessage = styled.div`
   text-align: center;
-  width: 100%; // Asegúrate de que ocupa todo el ancho del contenedor
+  width: 100%;
 `;
 
-// Funciones auxiliares para generar la URL de la imagen
+const Controls = styled.div`
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+`;
+
 const getRandomInt = (max) => Math.floor(Math.random() * max);
 const getImageURL = (gender) =>
   `https://randomuser.me/api/portraits/${gender === 'female' ? 'women' : 'men'}/${getRandomInt(100)}.jpg`;
 
 function App() {
   const [userData, setUserData] = useState({
-    status: 'loading', // Estados: 'loading', 'loaded', 'error'
+    status: 'loading',
     users: [],
   });
+  const [resultCount, setResultCount] = useState(10);
 
-  useEffect(() => {
-    fetch('https://randomuser.me/api/?results=10&nat=es')
+  const loadUsers = (count) => {
+    setUserData({ ...userData, status: 'loading' });
+    fetch(`https://randomuser.me/api/?results=${count}&nat=es`)
       .then((response) => response.json())
       .then((data) => {
         const users = data.results.map((user) => ({
@@ -69,31 +74,42 @@ function App() {
         console.error('Error fetching data: ', error);
         setUserData({ status: 'error', users: [] });
       });
-  }, []);
+  };
 
-  if (userData.status === 'loading') {
-    return (
-      <AppContainer>
-        <LoadingMessage>Cargando...</LoadingMessage>
-      </AppContainer>
-    );
-  }
-
-  if (userData.status === 'error') {
-    return (
-      <AppContainer>
-        <LoadingMessage>Error al cargar los datos.</LoadingMessage>
-      </AppContainer>
-    );
-  }
+  useEffect(() => {
+    loadUsers(resultCount);
+  }, [resultCount]);
 
   return (
     <AppContainer>
-      <GridLayout>
-        {userData.users.map((user, index) => (
-          <UserCard key={index} user={user} />
-        ))}
-      </GridLayout>
+      <Controls>
+        <select
+          value={resultCount}
+          onChange={(e) => setResultCount(e.target.value)}
+          disabled={userData.status === 'loading'}
+        >
+          {[5, 10, 15, 20].map((count) => (
+            <option key={count} value={count}>
+              {count}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => loadUsers(resultCount)}
+          disabled={userData.status === 'loading'}
+        >
+          Recargar
+        </button>
+      </Controls>
+      {userData.status === 'loading' && <LoadingMessage>Cargando...</LoadingMessage>}
+      {userData.status === 'error' && <LoadingMessage>Error al cargar los datos.</LoadingMessage>}
+      {userData.status === 'loaded' && (
+        <GridLayout>
+          {userData.users.map((user, index) => (
+            <UserCard key={index} user={user} />
+          ))}
+        </GridLayout>
+      )}
     </AppContainer>
   );
 }
