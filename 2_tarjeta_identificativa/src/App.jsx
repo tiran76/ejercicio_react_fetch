@@ -1,35 +1,26 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// App.jsx
+import { useState } from 'react';
+import { UserCard } from './UserCard'; // Asegúrate de que la ruta sea correcta
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user] = useState({
+    name: "EUGENIO",
+    surname: "RUIZ DOMENECH",
+    username: "eugenio_98",
+    gender: "male",
+    birthdate: "05/04/1998",
+    age: 25,
+    email: "eugenio_98@hotmail.com",
+    province: "Sevilla",
+    image: "https://randomuser.me/api/portraits/lego/1.jpg",
+  });
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <UserCard user={user} />
+    </div>
+  );
 }
 
-export default App
+export default App;
